@@ -1,0 +1,165 @@
+### ==============================================================================
+### HadirKu REST API Client Testing
+### ==============================================================================
+
+@baseUrl = http://localhost:5000/api
+
+### 1. Root & Health Check Endpoints
+# Root API Banner
+GET http://localhost:5000/
+
+### Health Check (Koneksi Database & Server Status)
+GET {{baseUrl}}/health
+
+
+### ==============================================================================
+### 2. Autentikasi & Login (JWT Generation)
+### ==============================================================================
+
+### Login Admin HR (Ahmad Fauzi)
+# @name loginAdmin
+POST {{baseUrl}}/karyawan/login
+Content-Type: application/json
+
+{
+  "email": "ahmad.fauzi@hadirku.id",
+  "password": "123456",
+  "role": "admin"
+}
+
+### Login Karyawan (Alexsander Jajang)
+# @name loginKaryawan
+POST {{baseUrl}}/karyawan/login
+Content-Type: application/json
+
+{
+  "email": "alexjajang@gmail.com",
+  "password": "123456",
+  "role": "karyawan"
+}
+
+### Variabel Token dari Hasil Login di atas
+@adminToken = {{loginAdmin.response.body.token}}
+@userToken = {{loginKaryawan.response.body.token}}
+
+
+### ==============================================================================
+### 3. Karyawan Endpoints (CRUD)
+### ==============================================================================
+
+### Ambil Semua Karyawan (Memerlukan Token)
+GET {{baseUrl}}/karyawan
+Authorization: Bearer {{adminToken}}
+
+### Ambil Karyawan By ID (ID: 1)
+GET {{baseUrl}}/karyawan/1
+Authorization: Bearer {{adminToken}}
+
+### Tambah Karyawan Baru (Khusus Admin)
+POST {{baseUrl}}/karyawan
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "nama": "Rian Pratama",
+  "email": "rian.pratama@hadirku.id",
+  "password": "password123",
+  "posisi": "Frontend Developer",
+  "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+  "role": "karyawan"
+}
+
+### Update Data Karyawan (ID: 1)
+PUT {{baseUrl}}/karyawan/1
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "nama": "Alexsander Jajang",
+  "email": "alexjajang@gmail.com",
+  "posisi": "Senior Software Engineer",
+  "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+  "role": "karyawan"
+}
+
+
+### ==============================================================================
+### 4. Absensi Endpoints
+### ==============================================================================
+
+### Statistik Presensi Admin Dashboard (Khusus Admin)
+GET {{baseUrl}}/absensi/statistik
+Authorization: Bearer {{adminToken}}
+
+### Semua Log Presensi Karyawan
+GET {{baseUrl}}/absensi
+Authorization: Bearer {{adminToken}}
+
+### Daftar Presensi Hari Ini
+GET {{baseUrl}}/absensi/hari-ini
+Authorization: Bearer {{adminToken}}
+
+### Status Presensi Hari Ini untuk Karyawan ID 1
+GET {{baseUrl}}/absensi/status-hari-ini/1
+Authorization: Bearer {{userToken}}
+
+### Riwayat Absensi Karyawan ID 1 (14 Hari Terakhir)
+GET {{baseUrl}}/absensi/riwayat/1
+Authorization: Bearer {{userToken}}
+
+### Absen Masuk (Clock In)
+POST {{baseUrl}}/absensi/masuk
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "karyawan_id": 1,
+  "lokasi_masuk": "Dalam Radius Kantor (Graha Pratama Lt. 8)",
+  "catatan": "Hadir tepat waktu"
+}
+
+### Absen Pulang (Clock Out)
+POST {{baseUrl}}/absensi/pulang
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "karyawan_id": 1,
+  "lokasi_pulang": "Dalam Radius Kantor (Graha Pratama Lt. 8)",
+  "catatan": "Shift selesai tuntas"
+}
+
+
+### ==============================================================================
+### 5. Izin / Cuti Endpoints
+### ==============================================================================
+
+### Ambil Semua Pengajuan Izin (Khusus Admin)
+GET {{baseUrl}}/izin
+Authorization: Bearer {{adminToken}}
+
+### Ambil Riwayat Izin per Karyawan (ID: 1)
+GET {{baseUrl}}/izin/karyawan/1
+Authorization: Bearer {{userToken}}
+
+### Ajukan Izin / Cuti Baru
+POST {{baseUrl}}/izin
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "karyawan_id": 1,
+  "tanggal_mulai": "2026-09-25",
+  "tanggal_selesai": "2026-09-26",
+  "tipe": "Cuti Tahunan",
+  "alasan": "Keperluan keluarga di luar kota"
+}
+
+### Update Status Izin oleh HR (Disetujui / Ditolak - ID: 1)
+PUT {{baseUrl}}/izin/1/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "Disetujui"
+}

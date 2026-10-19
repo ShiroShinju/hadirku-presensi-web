@@ -1,0 +1,44 @@
+# Dependencies (Backend & Frontend)
+node_modules/
+*/node_modules/
+
+# Production Build Output (Frontend Vite)
+dist/
+dist-ssr/
+frontend/dist/
+*.local
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+
+# Logs & Debugging
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor & IDE settings
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Temporary Uploads
+backend/public/uploads/*
+!backend/public/uploads/.gitkeep
+
+# File Video
+*.mp4
+
+# Mockup / Desain Awal
+tampilan1/
+
