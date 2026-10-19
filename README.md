@@ -59,8 +59,9 @@ Struktur folder mengikuti arsitektur modular ES Modules (`nodejs_esm`):
 project3/
 ├── .gitignore                     # Aturan pengabaian file git (node_modules, .env, dist)
 ├── backend/
+│   ├── .env.example            # Template konfigurasi environment (DB, JWT, Port)
 │   ├── config/
-│   │   └── db.mjs                  # Koneksi pool mysql2/promise ke karyawan2_db
+│   │   └── db.mjs              # Koneksi pool mysql2/promise berbasis .env
 │   ├── controllers/
 │   │   ├── absensiController.mjs   # Kontroler clock in/out, riwayat, statistik
 │   │   ├── izinController.mjs      # Kontroler pengajuan & persetujuan cuti
@@ -97,8 +98,6 @@ project3/
 │   ├── vite.config.js              # Konfigurasi Vite & dev proxy
 │   └── package.json
 │
-├── tampilan1/                      # Referensi mockup desain HTML awal
-├── design_thinking_text_based.txt  # Dokumen spesifikasi kebutuhan sistem
 └── README.md
 ```
 
@@ -112,8 +111,8 @@ project3/
 
 ### Langkah 1: Clone Repositori
 ```bash
-git clone https://github.com/ShiroShinju/project3.git
-cd project3
+git clone https://github.com/ShiroShinju/hadirku-presensi-web.git
+cd hadirku-presensi-web
 ```
 
 ---
@@ -145,14 +144,10 @@ cd ..
    ```bash
    mysql -u root -p < backend/console.sql
    ```
-3. Sesuaikan kredensial koneksi database pada file [`backend/config/db.mjs`](file:///C:/WorkspaceBBPVP/project3/backend/config/db.mjs) sesuai pengaturan MySQL lokal Anda:
-   ```javascript
-   const db = await mysql.createConnection({
-       host: 'localhost',
-       user: 'root',
-       password: 'your_mysql_password', // Sesuaikan dengan password MySQL Anda
-       database: 'karyawan2_db'
-   });
+3. Salin file template `.env.example` menjadi `.env` pada folder `backend`:
+   ```bash
+   cd backend
+   cp .env.example .env   # atau copy paste manual di Windows
    ```
 
 ---
