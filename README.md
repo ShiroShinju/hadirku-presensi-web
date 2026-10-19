@@ -27,9 +27,12 @@ Aplikasi Web Absensi & Portal Karyawan Modern berbasis **Design Thinking**, meng
    - **Kelola Data Karyawan (CRUD Lengkap)**: Tambah, Edit, dan Hapus Karyawan langsung ke MySQL dengan otomatisasi enkripsi password & fitur reset password.
    - **Persetujuan Cuti**: Aksi *Setujui* atau *Tolak* permohonan izin karyawan secara instan.
    - **Ekspor Rekap Bulanan**: Unduh data presensi ke format file CSV / Excel atau Cetak Dokumen Laporan (PDF).
-6. **Autentikasi & Portal Keamanan (Bcrypt + JWT)**:
+6. **Autentikasi & Arsitektur Keamanan Berlapis**:
    - Verifikasi login email/NIP dan kata sandi menggunakan hash **Bcrypt**.
    - Pengamanan sesi menggunakan token **JWT (JSON Web Token)** dengan masa aktif 24 jam.
+   - **Rate Limiting (`express-rate-limit`)**: Proteksi login anti brute-force (maksimal 10 percobaan per 15 menit).
+   - **Proteksi IDOR & Anti Titip Absen**: Karyawan non-admin hanya dapat mengakses data presensi miliknya sendiri dan dipaksa menggunakan identitas sesi sendiri.
+   - **Keamanan HTTP & CORS**: Integrasi security headers via **Helmet** dan pembatasan origin CORS.
    - Tab switcher role *Karyawan (Portal Pribadi)* dan *Admin / HR (Manajemen Tim)* dengan validasi role otomatis.
    - **Tombol Pintas Akun Demo (Quick-Fill)** pada halaman login untuk memudahkan demonstrasi dan pengujian dalam 1 kali klik.
 
@@ -37,7 +40,7 @@ Aplikasi Web Absensi & Portal Karyawan Modern berbasis **Design Thinking**, meng
 
 ## 👥 Akun Demo & Kredensial Pengujian
 
-Tabel `karyawan` pada file [`backend/console.sql`](file:///C:/WorkspaceBBPVP/project3/backend/console.sql) telah menyediakan data seed awal dengan password default **`123456`**:
+Tabel `karyawan` pada file [`backend/console.sql`](backend/console.sql) telah menyediakan data seed awal dengan password default **`123456`**:
 
 | Role | Nama | Email / Identifier | Password Default | Akses Halaman |
 | :--- | :--- | :--- | :--- | :--- |
@@ -56,7 +59,7 @@ Tabel `karyawan` pada file [`backend/console.sql`](file:///C:/WorkspaceBBPVP/pro
 Struktur folder mengikuti arsitektur modular ES Modules (`nodejs_esm`):
 
 ```text
-project3/
+hadirku-presensi-web/
 ├── .gitignore                     # Aturan pengabaian file git (node_modules, .env, dist)
 ├── backend/
 │   ├── .env.example            # Template konfigurasi environment (DB, JWT, Port)
@@ -137,17 +140,32 @@ cd ..
 
 ---
 
-### Langkah 3: Inisialisasi Database MySQL
+### Langkah 3: Inisialisasi Database MySQL & Konfigurasi Environment
 
 1. Pastikan service MySQL Anda telah aktif (melalui XAMPP, Laragon, MySQL Workbench, atau WebStorm Database Tool).
-2. Jalankan script SQL pada [`backend/console.sql`](file:///C:/WorkspaceBBPVP/project3/backend/console.sql) untuk membuat database `karyawan2_db`, tabel, dan seed datanya:
+2. Jalankan script SQL pada [`backend/console.sql`](backend/console.sql) untuk membuat database `karyawan2_db`, tabel, dan data awal:
    ```bash
    mysql -u root -p < backend/console.sql
    ```
 3. Salin file template `.env.example` menjadi `.env` pada folder `backend`:
    ```bash
    cd backend
-   cp .env.example .env   # atau copy paste manual di Windows
+   copy .env.example .env    # di Windows Command Prompt / PowerShell
+   # atau gunakan 'cp .env.example .env' di Linux / macOS / Git Bash
+   ```
+4. **Konfigurasi Kredensial MySQL Anda:**
+   Buka file `.env` yang baru saja dibuat di folder `backend`, lalu sesuaikan `DB_PASSWORD` (dan `DB_USER` jika berbeda) dengan password MySQL di komputer lokal Anda:
+   ```env
+   # backend/.env
+   DB_HOST=localhost
+   DB_USER=root
+   DB_PASSWORD=password_mysql_anda_disini   # Kosongkan jika MySQL Anda tanpa password
+   DB_NAME=karyawan2_db
+   DB_PORT=3306
+   ```
+5. Kembali ke direktori root proyek:
+   ```bash
+   cd ..
    ```
 
 ---
@@ -173,11 +191,11 @@ npm run dev
 
 ---
 
-## 🧪 Pengujian Endpoint API & Client Service ([`frontend/src/services/api.js`](file:///C:/WorkspaceBBPVP/project3/frontend/src/services/api.js))
+## 🧪 Pengujian Endpoint API & Client Service ([`frontend/src/services/api.js`](frontend/src/services/api.js))
 
-Frontend mengonsumsi API backend melalui service module [`frontend/src/services/api.js`](file:///C:/WorkspaceBBPVP/project3/frontend/src/services/api.js) dengan otomatis menyertakan header `Authorization: Bearer <jwt_token>` yang disimpan pada `sessionStorage` / `localStorage`.
+Frontend mengonsumsi API backend melalui service module [`frontend/src/services/api.js`](frontend/src/services/api.js) dengan otomatis menyertakan header `Authorization: Bearer <jwt_token>` yang disimpan pada `sessionStorage` / `localStorage`.
 
-Pengujian API secara langsung dapat dilakukan menggunakan file [`backend/test_api.rest`](file:///C:/WorkspaceBBPVP/project3/backend/test_api.rest) (didukung di WebStorm HTTP Client & VS Code REST Client).
+Pengujian API secara langsung dapat dilakukan menggunakan file [`backend/test_api.rest`](backend/test_api.rest) (didukung di WebStorm HTTP Client & VS Code REST Client).
 
 ### Daftar Endpoint Lengkap:
 
